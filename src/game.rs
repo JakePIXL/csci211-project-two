@@ -73,17 +73,31 @@ impl GameManager {
             println!("1. Create Question");
             println!("2. Create Game");
             println!("3. Edit Game");
-            println!("4. Back");
+            println!("4. Create User");
+            println!("5. Back");
             let input = self.get_user_input("Choose an option: ");
 
             match input.trim() {
                 "1" => self.create_question().await?,
                 "2" => self.create_game().await?,
                 "3" => self.edit_games().await?,
-                "4" => break,
+                "4" => self.create_player().await?,
+                "5" => break,
                 _ => println!("Invalid option!"),
             }
         }
+        Ok(())
+    }
+
+    async fn create_player(&mut self) -> Result<(), Box<dyn std::error::Error>> {
+        clear_screen();
+        let username = self.get_user_input("Enter username: ");
+        let password = self.get_user_input("Enter password: ");
+
+        self.db
+            .create_new_player(username.trim(), password.trim())
+            .await?;
+        println!("Player created successfully!");
         Ok(())
     }
 
