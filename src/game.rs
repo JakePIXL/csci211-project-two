@@ -359,7 +359,8 @@ impl GameManager {
 
             match choice.trim() {
                 "1" => {
-                    self.create_question_inner().await?;
+                    let question_id = self.create_question_inner().await?;
+                    self.add_question_to_game(game_id, question_id).await?;
                 }
                 "2" => {
                     self.remove_question_from_game(game_id).await?;
