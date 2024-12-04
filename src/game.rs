@@ -351,9 +351,10 @@ impl GameManager {
 
             println!("\nEdit Game Options:");
             println!("1. Add new question");
-            println!("2. Remove question");
-            println!("3. Reorder questions");
-            println!("4. Back");
+            println!("2. Add Existing question");
+            println!("3. Remove question");
+            println!("4. Reorder questions");
+            println!("5. Back");
 
             let choice = self.get_user_input("Enter your choice: ");
 
@@ -363,12 +364,15 @@ impl GameManager {
                     self.add_question_to_game(game_id, question_id).await?;
                 }
                 "2" => {
-                    self.remove_question_from_game(game_id).await?;
+                    self.add_existing_question(game_id).await?;
                 }
                 "3" => {
+                    self.remove_question_from_game(game_id).await?;
+                }
+                "4" => {
                     self.reorder_questions(game_id).await?;
                 }
-                "4" => break,
+                "5" => break,
                 _ => println!("Invalid choice, please try again."),
             }
         }
