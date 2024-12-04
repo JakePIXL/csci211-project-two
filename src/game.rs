@@ -243,6 +243,30 @@ impl GameManager {
         Ok(())
     }
 
+    async fn remove_question_from_game(
+        &self,
+        game_id: i32,
+    ) -> Result<(), Box<dyn std::error::Error>> {
+        clear_screen();
+        let questions = self.db.get_game_questions(game_id).await?;
+
+        println!("\nCurrent Questions:");
+        for question in &questions {
+            println!(
+                "{}. [ID: {}] {}",
+                question.question_order, question.question_id, question.question_text
+            );
+        }
+
+        let input = self.get_user_input("Enter question id to remove: ");
+
+        self.db
+            .delete_game_question(game_id, input.trim().parse()?)
+            .await?;
+        println!("Question removed from game successfully!");
+        Ok(())
+    }
+
     async fn add_existing_question(&self, game_id: i32) -> Result<(), Box<dyn std::error::Error>> {
         let questions = self.db.get_all_questions().await?;
 
@@ -312,49 +336,47 @@ impl GameManager {
                     self.create_question_inner().await?;
                 }
                 "2" => {
-                    clear_screen();
-                    let question_id = self.get_user_input("Enter question ID to remove: ");
-                    let question_id: i32 = question_id.trim().parse()?;
-
-                    self.db.delete_game_question(game_id, question_id).await?;
-
-                    println!("Question removed successfully!");
+                    self.remove_question_from_game(game_id).await?;
                 }
                 "3" => {
-                    clear_screen();
-                    let questions = self.db.get_game_questions(game_id).await?;
-
-                    println!("\nCurrent Questions:");
-                    for question in &questions {
-                        println!(
-                            "{}. [ID: {}] {}",
-                            question.question_order, question.question_id, question.question_text
-                        );
-                    }
-
-                    println!(
-                        "\nEnter new order for questions (comma-separated list of question IDs)"
-                    );
-                    println!("Example: 3,1,4,2");
-                    let new_order = self.get_user_input("New order: ");
-
-                    let order_ids: Vec<i32> = new_order
-                        .split(',')
-                        .filter_map(|s| s.trim().parse().ok())
-                        .collect();
-
-                    for (new_order, &question_id) in order_ids.iter().enumerate() {
-                        self.db
-                            .update_question_order(game_id, question_id, new_order as i32 + 1)
-                            .await?;
-                    }
-
-                    println!("Questions reordered successfully!");
+                    self.reorder_questions(game_id).await?;
                 }
                 "4" => break,
                 _ => println!("Invalid choice, please try again."),
             }
         }
+
+        Ok(())
+    }
+
+    async fn reorder_questions(&self, game_id: i32) -> Result<(), Box<dyn std::error::Error>> {
+        clear_screen();
+        let questions = self.db.get_game_questions(game_id).await?;
+
+        println!("\nCurrent Questions:");
+        for question in &questions {
+            println!(
+                "{}. [ID: {}] {}",
+                question.question_order, question.question_id, question.question_text
+            );
+        }
+
+        println!("\nEnter new order for questions (comma-separated list of question IDs)");
+        println!("Example: 3,1,4,2");
+        let new_order = self.get_user_input("New order: ");
+
+        let order_ids: Vec<i32> = new_order
+            .split(',')
+            .filter_map(|s| s.trim().parse().ok())
+            .collect();
+
+        for (new_order, &question_id) in order_ids.iter().enumerate() {
+            self.db
+                .update_question_order(game_id, question_id, new_order as i32 + 1)
+                .await?;
+        }
+
+        println!("Questions reordered successfully!");
 
         Ok(())
     }
