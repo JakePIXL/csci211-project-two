@@ -54,6 +54,29 @@ impl Database {
         Ok(result)
     }
 
+    pub async fn get_all_players(&self) -> Result<Vec<Player>, sqlx::Error> {
+        sqlx::query_as!(
+            Player,
+            "SELECT player_id, username, password_hash, created_at FROM players"
+        )
+        .fetch_all(&self.pool)
+        .await
+    }
+
+    pub async fn delete_player(&self, player_id: i32) -> Result<(), sqlx::Error> {
+        sqlx::query!(
+            r#"
+            DELETE FROM players
+            WHERE player_id = ?
+            "#,
+            player_id
+        )
+        .execute(&self.pool)
+        .await?;
+
+        Ok(())
+    }
+
     pub async fn create_new_player(
         &self,
         username: &str,

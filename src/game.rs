@@ -74,7 +74,8 @@ impl GameManager {
             println!("2. Create Game");
             println!("3. Edit Game");
             println!("4. Create User");
-            println!("5. Back");
+            println!("5. Delete User");
+            println!("6. Back");
             let input = self.get_user_input("Choose an option: ");
 
             match input.trim() {
@@ -82,7 +83,8 @@ impl GameManager {
                 "2" => self.create_game().await?,
                 "3" => self.edit_games().await?,
                 "4" => self.create_player().await?,
-                "5" => break,
+                "5" => self.delete_players().await?,
+                "6" => break,
                 _ => println!("Invalid option!"),
             }
         }
@@ -98,6 +100,30 @@ impl GameManager {
             .create_new_player(username.trim(), password.trim())
             .await?;
         println!("Player created successfully!");
+        Ok(())
+    }
+
+    async fn delete_players(&mut self) -> Result<(), Box<dyn std::error::Error>> {
+        clear_screen();
+        let players = self.db.get_all_players().await?;
+
+        println!("\nAll players:");
+        for player in &players {
+            println!("{}. {}", player.player_id, player.username);
+        }
+
+        let input = self.get_user_input("Enter player ID to delete: ");
+
+        if let Ok(player_id) = input.trim().parse::<i32>() {
+            if players.iter().any(|p| p.player_id == player_id) {
+                self.db.delete_player(player_id).await?;
+                println!("Player deleted successfully!");
+            } else {
+                println!("Invalid player ID!");
+            }
+        } else {
+            println!("Invalid input!");
+        }
         Ok(())
     }
 
