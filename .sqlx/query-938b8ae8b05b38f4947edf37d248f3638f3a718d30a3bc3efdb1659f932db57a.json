@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "\n            INSERT INTO questions (question_text, correct_answer, created_by)\n            VALUES (?, ?, ?)\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 3
+    },
+    "nullable": []
+  },
+  "hash": "938b8ae8b05b38f4947edf37d248f3638f3a718d30a3bc3efdb1659f932db57a"
+}

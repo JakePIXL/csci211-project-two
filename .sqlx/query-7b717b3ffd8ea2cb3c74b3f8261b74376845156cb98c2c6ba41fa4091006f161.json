@@ -1,0 +1,24 @@
+{
+  "db_name": "MySQL",
+  "query": "\n                SELECT COALESCE(MAX(question_order), 0) as max_order\n                FROM game_questions\n                WHERE game_id = ?\n                ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "max_order",
+        "type_info": {
+          "type": "Long",
+          "flags": "BINARY",
+          "max_size": 11
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      true
+    ]
+  },
+  "hash": "7b717b3ffd8ea2cb3c74b3f8261b74376845156cb98c2c6ba41fa4091006f161"
+}

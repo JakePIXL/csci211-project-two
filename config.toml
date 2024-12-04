@@ -1,0 +1,3 @@
+[database]
+url = "mysql://gameuser:AwesomePassword@mariadb-test.orb.local/Game"
+max_connections = 5
